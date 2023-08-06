@@ -1,11 +1,13 @@
 package tests;
 
+import helpers.DeleteUser;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.http.ContentType;
 import models.request.CreateOrderRequest;
 import models.request.CreateUserRequest;
 import models.response.CreateUserResponse;
+import org.junit.After;
 import org.junit.Test;
 
 import java.util.Map;
@@ -102,5 +104,14 @@ public class GetUserOrderTest extends BaseTest {
 
     private String[] getIngredients() {
         return new String[]{"61c0c5a71d1f82001bdaaa6d", "61c0c5a71d1f82001bdaaa6f", "61c0c5a71d1f82001bdaaa72"};
+    }
+
+    @After
+    public void deleteUser() {
+        if (token != null) {
+            DeleteUser.deleteUser(userEmail, userPassword, userName, token);
+        } else {
+            System.out.println("Пользователь в рамках теста не был создан. Удаление не требуется");
+        }
     }
 }

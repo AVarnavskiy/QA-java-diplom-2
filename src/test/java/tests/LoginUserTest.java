@@ -1,10 +1,13 @@
 package tests;
 
+import helpers.DeleteUser;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.http.ContentType;
 import models.request.CreateUserRequest;
 import models.request.LoginUserRequest;
+import models.response.CreateUserResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,6 +18,7 @@ public class LoginUserTest extends BaseTest {
     private String userEmail;
     private String userPassword;
     private String userName;
+    private String token;
     public static final String ENDPOINT = "/api/auth/login";
     public static final String CREATE_USER_ENDPOINT = "/api/auth/register";
 
@@ -53,14 +57,17 @@ public class LoginUserTest extends BaseTest {
     @Step("Создать уникального пользователя")
     public void createUser() {
         CreateUserRequest user = new CreateUserRequest(userEmail, userPassword, userName);
-        given()
+        response = given()
                 .log().all()
                 .contentType(ContentType.JSON)
                 .body(user)
                 .when()
-                .post(CREATE_USER_ENDPOINT)
-                .then()
+                .post(CREATE_USER_ENDPOINT);
+
+        response.then()
                 .statusCode(200);
+
+        token = response.as(CreateUserResponse.class).getAccessToken();
     }
 
     @Step("Отправить запрос на авторизацию пользователя")
@@ -71,5 +78,10 @@ public class LoginUserTest extends BaseTest {
                 .body(user)
                 .when()
                 .post(ENDPOINT);
+    }
+
+    @After
+    public void deleteUser() {
+        DeleteUser.deleteUser(userEmail, userPassword, userName, token);
     }
 }

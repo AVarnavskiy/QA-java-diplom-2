@@ -1,11 +1,13 @@
 package tests;
 
+import helpers.DeleteUser;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.http.ContentType;
 import models.request.CreateUserRequest;
 import models.request.UpdateUserDataRequest;
 import models.response.CreateUserResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -135,5 +137,10 @@ public class UpdateUserDataTest extends BaseTest{
                 .body(updateUser)
                 .when()
                 .patch(ENDPOINT);
+    }
+
+    @After
+    public void deleteUser() {
+        DeleteUser.deleteUser(userEmail, userPassword, userName, token);
     }
 }
